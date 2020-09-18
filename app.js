@@ -5,6 +5,8 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+// Import routes
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
@@ -12,6 +14,8 @@ const app = express();
 app.use(morgan("dev"));
 // middleware
 app.use(express.static("public"));
+// To be able to parse json objects in the body of the requests:
+app.use(express.json());
 
 // view engine
 app.set("view engine", "ejs");
@@ -25,6 +29,8 @@ mongoose
   })
   .then((result) => {
     console.log("Database connected");
+
+    // We only set the server if the db connection is successful
     app.listen(3000, () => {
       console.log("Server listening on port 3000");
     });
@@ -34,3 +40,4 @@ mongoose
 // routes
 app.get("/", (req, res) => res.render("home"));
 app.get("/smoothies", (req, res) => res.render("smoothies"));
+app.use(authRoutes); // No hace falta poner el slash /  en este caso
