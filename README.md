@@ -73,8 +73,84 @@ Then to include a *partial*. Note that the partial directory will be relative to
   })
   ```
 
-* Minimum length of filed: `minLength: 6`
+* Minimum length of filed: `minlength: 6`
 
 * Understand the `_v` field: it's only generated when a document(s) is inserted through mongoose.
 
   The __v field is called the version key. It describes the internal  revision of a document. This __v field is used to track the revisions of a document. By default, its value is zero. In real practice, the __v  field increments by one only when an array is updated. In other  situations, the value of the __v field remains unaffected. So to keep  the track of __v field in such situations, we can do it manually using  the increment operator provided by the mongoose.
+
+#### Mongoose Validation
+
+```shell
+npm install validator
+```
+
+
+
+ we can add custom validation messages when defining the model schema with mongoose:
+
+```js
+    email: {
+      type: String,
+      required: [true, "Please enter an email"],
+      unique: true,
+      lowercase: true,
+      validate: [(val) => {console.log('Validation here')}, "Please enter a valid email"],
+    },
+
+```
+
+We can use custom functions to validate:
+
+```js
+validate: [isEmail, 'Please enter a valir email']
+```
+
+To implement this validation we need to use a try/catch block and check for the type of error message before sending back to the user the problem.
+
+We usually receive a message starting with `user validation failed: ` followed by all the fields that were invalid
+
+```js
+  try {
+    const user = await User.create({ email, password });
+    res.status(201).json(user);
+  } catch (err) {
+    // We need to check if this is a validation error
+    const errors = handleErrors(err);
+    res.status(400).json(errors);
+  }
+
+
+const handleErrors = (err) => {
+  console.log(err.message, err.code); // The error message always exists, but the error code it doesn't always exist!
+  let errors = { email: "", password: "" };
+
+  // Validation errors:
+  if (err.message.includes("user validation failed"))
+    // console.log(Object.values(err.errors));
+    Object.values(err.errors).forEach(({ properties }) => {
+      //   console.log(properties);
+      errors[properties.path] = properties.message;
+    });
+
+  return errors;
+};
+
+```
+
+In the case of having a duplicate entry error, this will not be handled by the validation library. We need to do it manually. If we console log the error message and code:
+
+```shell
+E11000 duplicate key error collection: jwt-auth.users index: email_1 dup key: { email: "daniprol@hotmail.com" } 11000
+```
+
+We can add this part to the `handleErrors` functions:
+
+```js
+  // Duplicate error code:
+  if (err.code === 11000) {
+      errors.email = 'That email is already registered'
+      return errors
+  }
+```
+
