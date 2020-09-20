@@ -154,3 +154,34 @@ We can add this part to the `handleErrors` functions:
   }
 ```
 
+#### Mongoose hooks:
+
+Function that fires after specific events happen (e.g., when a user is saved into the database).
+
+```js
+// Fire a function BEFORE a doc is saved to the db
+userSchema.pre("save", function (next) {
+  // By using a normal function, then 'this' will refer to the model instance
+  console.log("User is about to be created and saved to the db", this);
+  // We still wont see the field '_v' which is created after saving
+  next();
+});
+
+// fire a function after a doc is saved to the db
+userSchema.post("save", function (doc, next) {
+  console.log("New user was created and saved", doc);
+  next();
+});
+
+```
+
+* We can use this to hashed passwords before the documents are created in the database.
+
+```js
+userSchema.pre("save", async function (next) {
+  const salt = bcrypt.genSalt();
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+```
+

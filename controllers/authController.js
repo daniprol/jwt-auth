@@ -50,3 +50,22 @@ module.exports.login_post = (req, res) => {
   console.log(email, password);
   res.send("new login");
 };
+
+module.exports.delete_user = async (req, res) => {
+  userId = req.params.userId;
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    console.log(`User deleted from db: `, deletedUser);
+
+    return res.status(200).json({
+      message: `User with id ${userId} deleted from database`,
+      deletedUser,
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(400).json({ message: err.message });
+    return;
+  }
+};

@@ -7,4 +7,7 @@ router.post("/signup", authController.signup_post);
 router.get("/login", authController.login_get);
 router.post("/login", authController.login_post);
 
+// Delete user by id:
+router.delete("/delete/:userId", authController.delete_user);
+
 module.exports = router;
