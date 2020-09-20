@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== "production") {
 const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
 // Import routes
 const authRoutes = require("./routes/authRoutes");
 
@@ -16,6 +17,8 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 // To be able to parse json objects in the body of the requests:
 app.use(express.json());
+// Cookie parser:
+app.use(cookieParser());
 
 // view engine
 app.set("view engine", "ejs");
@@ -41,3 +44,25 @@ mongoose
 app.get("/", (req, res) => res.render("home"));
 app.get("/smoothies", (req, res) => res.render("smoothies"));
 app.use(authRoutes); // No hace falta poner el slash /  en este caso
+
+// Cookies
+app.get("/set-cookies", (req, res) => {
+  // res.setHeader("Set-cookie", "newUser=true");
+  res.cookie("newUser", false); // It the cookie exists it will overwrite it!
+  res.cookie("isSunday", true); // It the cookie exists it will overwrite it!
+  res.cookie("isEmployee", false, {
+    maxAge: 1000 * 60 * 60 * 24,
+    // secure: true,
+    httpOnly: true,
+  });
+  res.send("You got the new cookie!");
+});
+
+app.get("/read-cookies", (req, res) => {
+  const cookies = req.cookies;
+  // const cook = req.headers.cookie;
+  console.log(cookies);
+  // console.log(cook);
+  // res.json(cook);
+  res.json(cookies);
+});
