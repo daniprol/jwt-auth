@@ -46,23 +46,23 @@ app.get("/smoothies", (req, res) => res.render("smoothies"));
 app.use(authRoutes); // No hace falta poner el slash /  en este caso
 
 // Cookies
-app.get("/set-cookies", (req, res) => {
-  // res.setHeader("Set-cookie", "newUser=true");
-  res.cookie("newUser", false); // It the cookie exists it will overwrite it!
-  res.cookie("isSunday", true); // It the cookie exists it will overwrite it!
-  res.cookie("isEmployee", false, {
-    maxAge: 1000 * 60 * 60 * 24,
-    // secure: true,
-    httpOnly: true,
-  });
-  res.send("You got the new cookie!");
-});
+// app.get("/set-cookies", (req, res) => {
+//   // res.setHeader("Set-cookie", "newUser=true");
+//   res.cookie("newUser", false); // It the cookie exists it will overwrite it!
+//   res.cookie("isSunday", true); // It the cookie exists it will overwrite it!
+//   res.cookie("isEmployee", false, {
+//     maxAge: 1000 * 60 * 60 * 24,
+//     // secure: true,
+//     httpOnly: true,
+//   });
+//   res.send("You got the new cookie!");
+// });
 
-app.get("/read-cookies", (req, res) => {
-  const cookies = req.cookies;
-  // const cook = req.headers.cookie;
-  console.log(cookies);
-  // console.log(cook);
-  // res.json(cook);
-  res.json(cookies);
-});
+// app.get("/read-cookies", (req, res) => {
+//   const cookies = req.cookies;
+//   // const cook = req.headers.cookie;
+//   console.log(cookies);
+//   // console.log(cook);
+//   // res.json(cook);
+//   res.json(cookies);
+// });

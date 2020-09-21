@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 // Handle errors:
 const handleErrors = (err) => {
@@ -21,6 +22,13 @@ const handleErrors = (err) => {
   return errors;
 };
 
+// CREATE JWT
+const maxAge = 3 * 24 * 3600; // In JWT the time must be in SECONDS!!
+const createToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_TOKEN, {
+    expiresIn: maxAge,
+  });
+};
 module.exports.signup_get = (req, res) => {
   res.render("signup"); // Se refiere a renderizar 'signup.ejs' !!!!
 };
@@ -35,7 +43,9 @@ module.exports.signup_post = async (req, res) => {
 
   try {
     const user = await User.create({ email, password });
-    res.status(201).json(user);
+    const token = createToken(user._id);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
+    res.status(201).json({ user: user._id });
   } catch (err) {
     // We need to check if this is a validation error
     const errors = handleErrors(err);
