@@ -110,11 +110,13 @@ To implement this validation we need to use a try/catch block and check for the 
 
 We usually receive a message starting with `user validation failed: ` followed by all the fields that were invalid
 
+**IMPORTANT:** the `catch(error)` when trying to create an user will have any validation message embedded!
+
 ```js
   try {
     const user = await User.create({ email, password });
     res.status(201).json(user);
-  } catch (err) {
+  } catch (err) { 
     // We need to check if this is a validation error
     const errors = handleErrors(err);
     res.status(400).json(errors);

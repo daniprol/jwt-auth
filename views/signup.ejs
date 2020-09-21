@@ -13,9 +13,14 @@
 
 <script>
   const form = document.querySelector("form");
+  const emailError = document.querySelector(".email.error");
+  const passwordError = document.querySelector(".password.error");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    // Reset errors every time the form is submitted:
+    emailError.textContent = "";
+    passwordError.textContent = "";
     // get the values from the form
     const email = form.email.value;
     const password = form.password.value;
@@ -27,9 +32,27 @@
         body: JSON.stringify({ email: email, password: password }),
         headers: { "Content-Type": "application/json" },
       });
+      const data = await res.json(); // We receive a JSON response from the server
+      console.log(data);
+
+      if (data.errors) {
+        emailError.textContent = data.errors.email;
+        if (data.errors.email.length > 0) {
+          form.email.value = "";
+        }
+        passwordError.textContent = data.errors.password;
+        // if (data.errors.password.length > 0) {
+        form.password.value = "";
+        // }
+      }
+
+      if (data.user) {
+        location.assign("/");
+      }
     } catch (err) {
       console.log(err);
     }
+    // form.reset();
   });
 </script>
 <%- include('partials/footer') %>

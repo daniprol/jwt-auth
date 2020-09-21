@@ -49,7 +49,7 @@ module.exports.signup_post = async (req, res) => {
   } catch (err) {
     // We need to check if this is a validation error
     const errors = handleErrors(err);
-    res.status(400).json(errors);
+    res.status(400).json({ errors });
   }
   //   res.send("new signup");
 };
