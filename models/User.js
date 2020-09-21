@@ -39,6 +39,24 @@ userSchema.post("save", function (doc, next) {
   next();
 });
 
+// Create a static method to handle the  user login:
+userSchema.statics.login = async function (email, password) {
+  // Use 'function' to handle 'this' as the user model!
+  const user = await this.findOne({ email: email });
+
+  if (user) {
+    const auth = await bcrypt.compare(password, user.password); // We don't need any salt to make the password comparison!
+    // auth = True or False
+    console.log("Bcrypt auth: ", auth);
+    if (auth) {
+      return user;
+    } else {
+      throw Error("Incorrect password"); // We can catch this errors with a 'catch' block!
+    }
+  } else {
+    throw Error("Incorrect email"); // We need a 'catch' block to catch this error!
+  }
+};
 const User = mongoose.model("user", userSchema); // It has to be SINGULAR!!!
 
 module.exports = User;
