@@ -8,6 +8,8 @@ const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 // Import routes
 const authRoutes = require("./routes/authRoutes");
+// Import auth middleware
+const { requireAuth } = require("./middleware/authMiddleware");
 
 const app = express();
 
@@ -42,7 +44,7 @@ mongoose
 
 // routes
 app.get("/", (req, res) => res.render("home"));
-app.get("/smoothies", (req, res) => res.render("smoothies"));
+app.get("/smoothies", requireAuth, (req, res) => res.render("smoothies"));
 app.use(authRoutes); // No hace falta poner el slash /  en este caso
 
 // Cookies

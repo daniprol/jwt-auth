@@ -102,3 +102,9 @@ module.exports.delete_user = async (req, res) => {
     return;
   }
 };
+
+module.exports.logout_get = (req, res) => {
+  // We can't delete the jwt cookie from the server by we can replace it with a blank cookie with a minimum expiration date
+  res.cookie("jwt", "", { maxAge: 1 });
+  res.redirect("/");
+};
