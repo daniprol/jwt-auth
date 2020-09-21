@@ -187,3 +187,96 @@ userSchema.pre("save", async function (next) {
 });
 ```
 
+#### Create a login function with mongoose static methods
+
+Mongoose doesn't have a default function to handle login processes, but we can create one by attaching a static method to the object.
+
+```js
+// Create a static method to handle the  user login:
+userSchema.statics.login = async function (email, password) {
+  // Use 'function' to handle 'this' as the user model!
+  const user = await this.findOne({ email: email });
+
+  if (user) {
+    const auth = await bcrypt.compare(password, user.password); // We don't need any salt to make the password comparison!
+    // auth = True or False
+    console.log("Bcrypt auth: ", auth);
+    if (auth) {
+      return user;
+    } else {
+      throw Error("Incorrect password"); // We can catch this errors with a 'catch' block!
+    }
+  } else {
+    throw Error("Incorrect email"); // We need a 'catch' block to catch this error!
+  }
+};
+
+```
+
+We can call this function when the `/login` route is accessed:
+
+```js
+module.exports.login_post = async (req, res) => {
+  //   console.log(req.body);
+  const { email, password } = req.body;
+  console.log(email, password);
+
+  // Use a static method in mongoose to login users:
+  try {
+    const user = await User.login(email, password);
+    // now we have the user:
+    res.status(200).json({ user: user._id });
+  } catch (err) {
+    // We can catch the errors we defined!
+    res.status(400).json({ error: err.message });
+  }
+  // res.send("new login");
+};
+
+```
+
+All of this will be access from the front-end with a **FETCH** request!
+
+```js
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Reset errors every time the form is submitted:
+    emailError.textContent = "";
+    passwordError.textContent = "";
+    // get the values from the form
+    const email = form.email.value;
+    const password = form.password.value;
+
+    console.log(email, password);
+    try {
+      const res = await fetch("/login", {
+        method: "POST",
+        body: JSON.stringify({ email: email, password: password }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json(); // We receive a JSON response from the server
+      console.log(data);
+
+      if (data.errors) {
+        emailError.textContent = data.errors.email;
+        if (data.errors.email.length > 0) {
+          form.email.value = "";
+        }
+        passwordError.textContent = data.errors.password;
+        // if (data.errors.password.length > 0) {
+        form.password.value = "";
+        // }
+      }
+
+      if (data.user) {
+        // location.assign("/");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    // form.reset();
+  });
+
+```
+

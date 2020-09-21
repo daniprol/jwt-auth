@@ -6,6 +6,16 @@ const handleErrors = (err) => {
   console.log(err.message, err.code); // The error message always exists, but the error code it doesn't always exist!
   let errors = { email: "", password: "" };
 
+  // Incorrect email:
+  if (err.message === "incorrect email") {
+    errors.email = "That email is not registered";
+  }
+
+  // Incorrect password
+  if (err.message === "incorrect password") {
+    errors.password = "The password is incorrect";
+  }
+
   // Duplicate error code:
   if (err.code === 11000) {
     errors.email = "That email is already registered";
@@ -62,6 +72,8 @@ module.exports.login_post = async (req, res) => {
   // Use a static method in mongoose to login users:
   try {
     const user = await User.login(email, password);
+    const token = createToken(user._id);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge * 1000 });
     // now we have the user:
     res.status(200).json({ user: user._id });
   } catch (err) {
@@ -84,8 +96,9 @@ module.exports.delete_user = async (req, res) => {
       deletedUser,
     });
   } catch (err) {
+    const errors = handleErrors(err);
     console.log(err.message);
-    res.status(400).json({ message: err.message });
+    res.status(400).json({ errors });
     return;
   }
 };
