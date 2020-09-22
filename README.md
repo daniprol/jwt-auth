@@ -42,6 +42,14 @@ Then to include a *partial*. Note that the partial directory will be relative to
 
   This will use the `views/layout.ejs` as your layout.
 
+* How to apply a middleware to every single route:
+
+  ```js
+  app.use('*', checkUser)
+  ```
+
+  
+
 ### Mongoose
 
 * **WARNING:** when creating a new model the name **MUST** be <u>singular</u> (mongoose will take care of creating the collection with the plural name!).

@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 // Import routes
 const authRoutes = require("./routes/authRoutes");
 // Import auth middleware
-const { requireAuth } = require("./middleware/authMiddleware");
+const { requireAuth, checkUser } = require("./middleware/authMiddleware");
 
 const app = express();
 
@@ -43,13 +43,15 @@ mongoose
   .catch((err) => console.log(err));
 
 // routes
+// We want to apply the check user middleware to every single route:
+app.get("*", checkUser);
 app.get("/", (req, res) => res.render("home"));
 app.get("/smoothies", requireAuth, (req, res) => res.render("smoothies"));
 app.use(authRoutes); // No hace falta poner el slash /  en este caso
 
 // Cookies
 // app.get("/set-cookies", (req, res) => {
-//   // res.setHeader("Set-cookie", "newUser=true");
+//   // res.setHeader("Set-cookie", " newUser=true");
 //   res.cookie("newUser", false); // It the cookie exists it will overwrite it!
 //   res.cookie("isSunday", true); // It the cookie exists it will overwrite it!
 //   res.cookie("isEmployee", false, {
